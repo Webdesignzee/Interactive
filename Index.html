@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Code Blog with CSS and Save</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    #editor {
+      width: 100%;
+      height: 200px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      font-family: monospace;
+      white-space: pre-wrap;
+      overflow-y: scroll;
+    }
+    #preview {
+      margin-top: 20px;
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+    button {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Blog with Live Code Editor</h1>
+<p>Type your HTML and CSS code below:</p>
+<div id="editor" contenteditable="true">
+  &lt;style&gt;
+    h1 {
+      color: blue;
+      font-size: 36px;
+    }
+  &lt;/style&gt;
+  &lt;h1&gt;Hello World&lt;/h1&gt;
+</div>
+
+<h2>Preview:</h2>
+<div id="preview"></div>
+
+<button id="saveBtn">Save Blog</button>
+
+<script>
+  const editor = document.getElementById('editor');
+  const preview = document.getElementById('preview');
+  let styleElement = null;
+
+  // Function to update the preview
+  function updatePreview() {
+    const content = editor.innerText; // Get content from the editor
+    preview.innerHTML = content;      // Apply it to the preview
+
+    // Clean up previously added style
+    if (styleElement) {
+      styleElement.remove();
+    }
+
+    // Extract and apply CSS if there's a <style> tag
+    const styleStart = content.indexOf('<style>');
+    const styleEnd = content.indexOf('</style>');
+    if (styleStart !== -1 && styleEnd !== -1) {
+      const styleContent = content.substring(styleStart + 7, styleEnd);
+      styleElement = document.createElement('style');
+      styleElement.textContent = styleContent;
+      document.head.appendChild(styleElement);
+    }
+  }
+
+  // Event listener to update the preview as the user types
+  editor.addEventListener('input', updatePreview);
+
+  // Initialize with default content
+  updatePreview();
+
+  // Save the blog content to a file
+  document.getElementById('saveBtn').addEventListener('click', function() {
+    const content = editor.innerText;
+    const blob = new Blob([content], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'blog.html';
+    a.click();
+
+    URL.revokeObjectURL(url);
+  });
+</script>
+
+</body>
+</html>
